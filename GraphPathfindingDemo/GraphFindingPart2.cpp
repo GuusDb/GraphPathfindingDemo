@@ -47,7 +47,7 @@ void createGraph() {
 		char node = 'a' + (std::rand() % (gridWidth * gridHeight));
 		if (!graph[node].empty()) {
 			int neighborIndex = std::rand() % graph[node].size();
-			graph[node][neighborIndex].second = 5 + (std::rand() % 6); // Weight between 5 and 10
+			graph[node][neighborIndex].second = 3 + (std::rand() % 8); // Weight between 3 and 10
 		}
 	}
 }
