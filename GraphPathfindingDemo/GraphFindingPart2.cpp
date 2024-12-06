@@ -41,13 +41,14 @@ void createGraph() {
 		}
 	}
 
-	// Assign 11 random heavy weights (5-10) to edges
+	// Assign 40 random heavy weights (3-10) to edges
 	std::srand(std::time(0));
-	for (int i = 0; i < 11; ++i) {
+	for (int i = 0; i < 40; ++i) {
 		char node = 'a' + (std::rand() % (gridWidth * gridHeight));
 		if (!graph[node].empty()) {
 			int neighborIndex = std::rand() % graph[node].size();
-			graph[node][neighborIndex].second = 3 + (std::rand() % 8); // Weight between 3 and 10
+			int newWeight = 3 + (std::rand() % 8); // Weight between 3 and 10
+			graph[node][neighborIndex].second = newWeight; // Apply the random weight
 		}
 	}
 }
@@ -80,8 +81,27 @@ std::vector<char> dijkstra(char start, char end) {
 	}
 
 	std::vector<char> shortestPath;
-	for (char at = end; at != 0; at = prev[at]) shortestPath.push_back(at);
+	for (char at = end; at != 0; at = prev[at]) {
+		shortestPath.push_back(at);
+	}
 	std::reverse(shortestPath.begin(), shortestPath.end());
+
+	// Log the path and the weights between nodes
+	std::cout << "Shortest Path (with weights):\n";
+	int totalWeight = 0;
+	for (size_t i = 0; i < shortestPath.size() - 1; ++i) {
+		char from = shortestPath[i];
+		char to = shortestPath[i + 1];
+		// Find the weight between nodes 'from' and 'to'
+		for (const auto& neighbor : graph[from]) {
+			if (neighbor.first == to) {
+				std::cout << from << " -> " << to << "\n";
+				totalWeight += neighbor.second;
+				break;
+			}
+		}
+	}
+
 	return shortestPath;
 }
 
