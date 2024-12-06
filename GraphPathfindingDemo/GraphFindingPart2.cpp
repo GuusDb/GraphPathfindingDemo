@@ -53,6 +53,29 @@ void createGraph() {
 	}
 }
 
+void logPath(const std::vector<char>& shortestPath) {
+	if (shortestPath.empty()) {
+		std::cout << "No path found.\n";
+		return;
+	}
+
+	std::cout << "Shortest Path (with weights):\n";
+	int totalWeight = 0;
+	for (size_t i = 0; i < shortestPath.size() - 1; ++i) {
+		char from = shortestPath[i];
+		char to = shortestPath[i + 1];
+		// Find the weight between nodes 'from' and 'to'
+		for (const auto& neighbor : graph[from]) {
+			if (neighbor.first == to) {
+				std::cout << from << " -> " << to << " (Weight: " << neighbor.second << ")\n";
+				totalWeight += neighbor.second;
+				break;
+			}
+		}
+	}
+	std::cout << "Total Weight: " << totalWeight << "\n";
+}
+
 std::vector<char> dijkstra(char start, char end) {
 	std::unordered_map<char, int> dist;
 	std::unordered_map<char, char> prev;
@@ -86,22 +109,7 @@ std::vector<char> dijkstra(char start, char end) {
 	}
 	std::reverse(shortestPath.begin(), shortestPath.end());
 
-	// Log the path and the weights between nodes
-	std::cout << "Shortest Path (with weights):\n";
-	int totalWeight = 0;
-	for (size_t i = 0; i < shortestPath.size() - 1; ++i) {
-		char from = shortestPath[i];
-		char to = shortestPath[i + 1];
-		// Find the weight between nodes 'from' and 'to'
-		for (const auto& neighbor : graph[from]) {
-			if (neighbor.first == to) {
-				std::cout << from << " -> " << to << "\n";
-				totalWeight += neighbor.second;
-				break;
-			}
-		}
-	}
-
+	logPath(shortestPath); // Log the path when generated
 	return shortestPath;
 }
 
@@ -158,6 +166,25 @@ void display() {
 	glFlush();
 }
 
+void mouseClick(int button, int state, int x, int y) {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		float fx = (float)x / windowSize * gridWidth;
+		float fy = (float)y / windowSize * gridHeight;
+		int gridX = static_cast<int>(fx);
+		int gridY = static_cast<int>(fy);
+
+		for (const auto& [node, pos] : positions) {
+			if (pos.first == gridX && pos.second == gridY) {
+				std::cout << "Node: " << node << "\nRelationships:\n";
+				for (const auto& [neighbor, weight] : graph[node]) {
+					std::cout << "  - " << node << " -> " << neighbor << " (Weight: " << weight << ")\n";
+				}
+				break;
+			}
+		}
+	}
+}
+
 void getUserInput() {
 	std::cout << "Grid Layout:\n";
 	int index = 0;
@@ -190,6 +217,7 @@ int main(int argc, char** argv) {
 	glutCreateWindow("Dijkstra Pathfinding Visualization (Weighted)");
 	glOrtho(0, gridWidth, gridHeight, 0, -1, 1);
 	glutDisplayFunc(display);
+	glutMouseFunc(mouseClick);
 	glutMainLoop();
 	return 0;
 }
